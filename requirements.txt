@@ -1,0 +1,15 @@
+# Core dependencies
+numpy
+pandas
+scikit-learn
+nltk
+spacy
+transformers
+torch
+faiss-cpu
+gradio
+streamlit
+
+# Utilities
+tqdm
+python-dotenv
