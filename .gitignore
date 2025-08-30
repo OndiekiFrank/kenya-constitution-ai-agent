@@ -205,3 +205,7 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+)
+Data/kenya_constitution_prepared.csv
+Data/kenya_constitution_structured.csv
