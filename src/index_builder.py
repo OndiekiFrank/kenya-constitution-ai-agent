@@ -1,74 +1,93 @@
 # src/index_builder.py
-
 import os
+os.environ["USE_TF"] = "0"   # Disable TensorFlow in HuggingFace
+
 import faiss
 import pickle
 import pandas as pd
 from sentence_transformers import SentenceTransformer
-from sklearn.feature_extraction.text import CountVectorizer
 
-# =========================
-# Config
-# =========================
-DATA_PATH = "Data/kenya_constitution.csv"   # Update if your file is different
-INDEX_PATH = "Data/faiss_index"
-PICKLE_PATH = "Data/chunks.pkl"
-MODEL_NAME = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+# ------------------------
+# CONFIG
+# ------------------------
+DATA_PATH = "Data\kenya_constitution_prepared.csv"   # <-- change if your CSV path is different
+MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"  # Lightweight, PyTorch-only
+INDEX_PATH = "data/faiss_index.bin"
+MAPPING_PATH = "data/id_to_metadata.pkl"
 
-# =========================
-# Step 1: Load Dataset
-# =========================
-def load_data(path=DATA_PATH):
-    df = pd.read_csv(path)
-    if "Text" not in df.columns:
-        raise ValueError("CSV must contain a 'Text' column with constitution text")
-    return df
+# ------------------------
+# LOAD DATA
+# ------------------------
+def load_data():
+    print("Loading data...")
+    df = pd.read_csv(DATA_PATH)
 
-# =========================
-# Step 2: Split into Chunks
-# =========================
-def split_into_chunks(texts, chunk_size=200, overlap=50):
-    chunks = []
-    for text in texts:
-        words = text.split()
-        for i in range(0, len(words), chunk_size - overlap):
-            chunk = " ".join(words[i:i + chunk_size])
-            chunks.append(chunk)
-    return chunks
+    # Normalize column names (case-insensitive)
+    df.columns = [c.strip().lower() for c in df.columns]
 
-# =========================
-# Step 3: Embed Chunks
-# =========================
-def build_index(chunks, model_name=MODEL_NAME):
-    model = SentenceTransformer(model_name)
-    embeddings = model.encode(chunks, show_progress_bar=True)
+    # Map your dataset’s actual columns to expected ones
+    column_map = {
+        "article/section": "section",
+        "text_english": "english_text",
+        "text_kiswahili": "kiswahili_text"
+    }
+    df = df.rename(columns=column_map)
 
+    if "english_text" not in df.columns:
+        raise ValueError(f"CSV must contain 'Text_English'. Found: {df.columns}")
+
+    return df, "english_text"
+
+# ------------------------
+# BUILD INDEX
+# ------------------------
+def build_index(df, text_col):
+    print(f" Loading model: {MODEL_NAME}")
+    model = SentenceTransformer(MODEL_NAME)
+
+    print(" Encoding sentences...")
+    embeddings = model.encode(
+        df[text_col].astype(str).tolist(),
+        batch_size=32,
+        show_progress_bar=True,
+        convert_to_numpy=True,
+        normalize_embeddings=True
+    )
+
+    print("Creating FAISS index...")
     dim = embeddings.shape[1]
-    index = faiss.IndexFlatL2(dim)
+    index = faiss.IndexFlatIP(dim)  # Inner product = cosine similarity (after normalization)
     index.add(embeddings)
 
+    print("Index built successfully.")
     return index, embeddings
 
-# =========================
-# Main Script
-# =========================
-if __name__ == "__main__":
-    print("Loading data...")
-    df = load_data()
-    
-    print(" Splitting into chunks...")
-    chunks = split_into_chunks(df["Text"].astype(str).tolist())
-    print(f"Created {len(chunks)} chunks")
-
-    print(" Building FAISS index...")
-    index, embeddings = build_index(chunks)
-
-    # Save index
-    print(f"Saving index to {INDEX_PATH}...")
+# ------------------------
+# SAVE INDEX + METADATA
+# ------------------------
+def save_index(index, df):
+    print(f"Saving FAISS index → {INDEX_PATH}")
     faiss.write_index(index, INDEX_PATH)
 
-    # Save chunks (for later retrieval mapping)
-    with open(PICKLE_PATH, "wb") as f:
-        pickle.dump(chunks, f)
+    print(f" Saving ID → metadata mapping → {MAPPING_PATH}")
+    id_to_metadata = {
+        i: {
+            "section": row.get("section", ""),
+            "english_text": row.get("english_text", ""),
+            "kiswahili_text": row.get("kiswahili_text", "")
+        }
+        for i, row in df.iterrows()
+    }
 
-    print("Indexing complete!")
+    with open(MAPPING_PATH, "wb") as f:
+        pickle.dump(id_to_metadata, f)
+
+    print(" Index and metadata saved.")
+
+# ------------------------
+# MAIN
+# ------------------------
+if __name__ == "__main__":
+    df, text_col = load_data()
+    index, embeddings = build_index(df, text_col)
+    save_index(index, df)
