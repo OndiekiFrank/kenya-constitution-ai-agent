@@ -82,7 +82,7 @@ def save_index(index, df):
     with open(MAPPING_PATH, "wb") as f:
         pickle.dump(id_to_metadata, f)
 
-    print(" Index and metadata saved.")
+    print("✅ Index and metadata saved.")
 
 # ------------------------
 # MAIN
