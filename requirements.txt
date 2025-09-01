@@ -1,15 +1,7 @@
-# Core dependencies
-numpy
-pandas
-scikit-learn
-nltk
-spacy
-transformers
-torch
-faiss-cpu
-gradio
+sentence-transformers==2.7.0
+fastapi
+uvicorn
+pydantic
 streamlit
-
-# Utilities
-tqdm
-python-dotenv
+pyarrow
+faiss-cpu==1.8.0
