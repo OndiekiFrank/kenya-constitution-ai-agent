@@ -1,83 +1,74 @@
-import os
-import faiss
-import numpy as np
-import pandas as pd
 import pickle
-
-# Force sentence-transformers to use Torch only (avoid TensorFlow issues)
-os.environ["USE_TF"] = "0"
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
-
+import faiss
+import pandas as pd
 from sentence_transformers import SentenceTransformer
+import numpy as np
+from pathlib import Path
 
 # Paths
-DATA_PATH = "Data"
-INDEX_FILE = os.path.join(DATA_PATH, "faiss_index.bin")
-META_FILE = os.path.join(DATA_PATH, "id_to_metadata.pkl")
-CSV_FILE = os.path.join(DATA_PATH, "kenya_constitution_prepared.csv")
+DATA_DIR = Path(_file_).resolve().parents[1] / "Data"
+INDEX_PATH = DATA_DIR / "faiss_index.bin"
+META_PATH = DATA_DIR / "id_to_metadata.pkl"
+CSV_PATH = DATA_DIR / "kenya_constitution_prepared.csv"
 
-# --- Load FAISS index ---
-if not os.path.exists(INDEX_FILE):
-    raise FileNotFoundError(f"FAISS index not found at {INDEX_FILE}")
-index = faiss.read_index(INDEX_FILE)
+# Load model once
+MODEL = SentenceTransformer("all-MiniLM-L6-v2")
 
-# --- Load metadata mapping ---
-id_to_metadata = {}
-if os.path.exists(META_FILE):
-    with open(META_FILE, "rb") as f:
-        id_to_metadata = pickle.load(f)
+# Load FAISS index
+faiss_index = faiss.read_index(str(INDEX_PATH))
 
-# --- Load CSV as fallback ---
-corpus = None
-if os.path.exists(CSV_FILE):
-    corpus = pd.read_csv(CSV_FILE)
+# Load metadata
+with open(META_PATH, "rb") as f:
+    id_to_metadata = pickle.load(f)
 
-# --- Load embedding model (CPU only) ---
-model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2", device="cpu")
+# Load full constitution (for optional context synthesis)
+constitution_df = pd.read_csv(CSV_PATH)
+
+
+def embed_text(text: str) -> np.ndarray:
+    """Convert text to embeddings."""
+    return MODEL.encode([text])
 
 
 def retrieve(query: str, k: int = 5):
-    """Retrieve top-k passages relevant to the query."""
-    q_emb = model.encode([query], convert_to_numpy=True, normalize_embeddings=True).astype("float32")
-    D, I = index.search(q_emb.reshape(1, -1), k)
+    """Retrieve top-k passages related to the query."""
+    query_vec = embed_text(query).astype("float32")
+    distances, indices = faiss_index.search(query_vec, k)
 
-    results = []
-    for idx, score in zip(I[0], D[0]):
-        meta = id_to_metadata.get(idx, {})
-        if not meta and corpus is not None and idx < len(corpus):
-            meta = corpus.iloc[idx].to_dict()
-        results.append({"id": int(idx), "score": float(score), "metadata": meta})
-    return results
-
-
-def synthesize_answer(query: str, hits: list):
-    """Concatenate retrieved text into a simple answer."""
-    texts = []
-    for hit in hits:
-        text = hit["metadata"].get("Text_English") or hit["metadata"].get("Text_Kiswahili") or str(hit["metadata"])
-        texts.append(text)
-    context = " ".join(texts)
-    return {
-        "query": query,
-        "answer": f"Based on the Constitution: {context[:800]}..."
-    }
+    hits = []
+    for i, idx in enumerate(indices[0]):
+        if idx == -1:  # Skip empty slots
+            continue
+        metadata = id_to_metadata.get(idx, {"text": "", "section": "Unknown"})
+        hits.append({
+            "rank": i + 1,
+            "score": float(distances[0][i]),
+            "section": metadata.get("section"),
+            "text": metadata.get("text"),
+        })
+    return hits
 
 
-def llm_synthesize_answer(query: str, hits: list):
-    """Stub for LLM-based synthesis (extend with OpenAI/Anthropic/etc.)."""
-    context = " ".join(
-        hit["metadata"].get("Text_English") or hit["metadata"].get("Text_Kiswahili") or str(hit["metadata"])
-        for hit in hits
-    )
-    return {
-        "query": query,
-        "answer": f"(LLM-Augmented) {context[:800]}..."
-    }
+def synthesize_answer(query: str, hits: list) -> str:
+    """Naive synthesis: concatenate retrieved text."""
+    if not hits:
+        return "No relevant information found in the constitution."
+    context = " ".join(hit["text"] for hit in hits)
+    return f"Based on the constitution, here’s what I found: {context}"
 
 
-if __name__ == "__main__":
-    # Quick test
+# ---------------------------------------------------
+# Run standalone for testing
+# ---------------------------------------------------
+if _name_ == "_main_":
     test_query = "What is the role of the president?"
+    print(f"Query: {test_query}\n")
+
     results = retrieve(test_query, k=3)
+    print("Top results:")
+    for r in results:
+        print(f"- Section: {r['section']} | Score: {r['score']:.4f}")
+        print(f"  Text: {r['text']}\n")
+
     answer = synthesize_answer(test_query, results)
-    print(answer)
+    print("Synthesized Answer:\n", answer)
