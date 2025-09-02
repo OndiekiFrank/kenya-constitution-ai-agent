@@ -10,16 +10,16 @@ from sentence_transformers import SentenceTransformer
 # ------------------------
 # CONFIG
 # ------------------------
-DATA_PATH = "Data\kenya_constitution_prepared.csv"   # <-- change if your CSV path is different
+DATA_PATH = "Data\kenya_constitution_structured.csv"   # <-- change if your CSV path is different
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"  # Lightweight, PyTorch-only
-INDEX_PATH = "data/faiss_index.bin"
-MAPPING_PATH = "data/id_to_metadata.pkl"
+INDEX_PATH = "Data/faiss_index.bin"
+MAPPING_PATH = "Data/id_to_metadata.pkl"
 
 # ------------------------
 # LOAD DATA
 # ------------------------
 def load_data():
-    print("Loading data...")
+    print("🔹 Loading data...")
     df = pd.read_csv(DATA_PATH)
 
     # Normalize column names (case-insensitive)
@@ -42,10 +42,10 @@ def load_data():
 # BUILD INDEX
 # ------------------------
 def build_index(df, text_col):
-    print(f" Loading model: {MODEL_NAME}")
+    print(f"🔹 Loading model: {MODEL_NAME}")
     model = SentenceTransformer(MODEL_NAME)
 
-    print(" Encoding sentences...")
+    print("🔹 Encoding sentences...")
     embeddings = model.encode(
         df[text_col].astype(str).tolist(),
         batch_size=32,
@@ -54,22 +54,22 @@ def build_index(df, text_col):
         normalize_embeddings=True
     )
 
-    print("Creating FAISS index...")
+    print("🔹 Creating FAISS index...")
     dim = embeddings.shape[1]
     index = faiss.IndexFlatIP(dim)  # Inner product = cosine similarity (after normalization)
     index.add(embeddings)
 
-    print("Index built successfully.")
+    print("✅ Index built successfully.")
     return index, embeddings
 
 # ------------------------
 # SAVE INDEX + METADATA
 # ------------------------
 def save_index(index, df):
-    print(f"Saving FAISS index → {INDEX_PATH}")
+    print(f"🔹 Saving FAISS index → {INDEX_PATH}")
     faiss.write_index(index, INDEX_PATH)
 
-    print(f" Saving ID → metadata mapping → {MAPPING_PATH}")
+    print(f"🔹 Saving ID → metadata mapping → {MAPPING_PATH}")
     id_to_metadata = {
         i: {
             "section": row.get("section", ""),
