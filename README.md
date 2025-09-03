@@ -8,3 +8,12 @@ This project aims to:
 - Classify legal text by language.  
 - Retrieve relevant constitutional articles.  
 - Support *question answering* and knowledge democratization.  
+
+##  Data Preparation
+- *Dataset size*: 121 legal text samples  
+- *Languages*: English & Kiswahili  
+- *Preprocessing steps*:
+  - Tokenization  
+  - Stopword removal  
+  - Vectorization (TF-IDF, embeddings for DL)  
+- *Splits*: Train (80%) / Test (20%)  
