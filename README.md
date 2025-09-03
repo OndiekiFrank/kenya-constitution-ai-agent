@@ -17,3 +17,8 @@ This project aims to:
   - Stopword removal  
   - Vectorization (TF-IDF, embeddings for DL)  
 - *Splits*: Train (80%) / Test (20%)  
+
+##  Exploratory Analysis
+- *English texts* contain words like: parliament, rights, constitution, president  
+- *Kiswahili texts* contain words like: katiba, bunge, rais, sheria  
+- The vocabularies are *highly distinct*, making classification straightforward.
