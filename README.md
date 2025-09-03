@@ -90,4 +90,7 @@ Understanding *why* models perform well is just as important as their accuracy.
 
  *Result: Linear models like Naive Bayes and Logistic Regression **excel*, while heavier tree ensembles underperform.
 
- 
+ ##  Caveat
+- Results are perfect, but dataset is *small (121 samples, 25 test samples)*.  
+- On *larger/noisier datasets* (slang, code-switching, spelling errors), performance may drop.
+
