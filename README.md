@@ -85,6 +85,16 @@ We used matplotlib and seaborn for the plots.
 
 Visualizations are stored in the images/ directory and embedded in the notebook.
 
+**Box Plot of Article Lengths by Language**
+![Image1](Images/Box%20plot-Articles%20length%20by%20language.png)
+
+- The box plot shows the **distribution, median, and outliers** of article lengths.
+
+
+
+
+
+
 
 ##  Models and Performance
 
