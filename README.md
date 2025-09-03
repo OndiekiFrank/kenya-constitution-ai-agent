@@ -14,6 +14,7 @@ An NLP-powered multilingual AI assistant for exploring the Kenyan Constitution i
 - [Recommendations](#recommendations)
 - [Conclusion](#conclusion)
 - [Team](#team)
+- [License](#license)
 
 ##  Business Context
 Kenya’s Constitution is published in both English and Kiswahili, but citizens, students, and policymakers often face challenges in accessing and understanding it.  
@@ -63,14 +64,26 @@ kenya-constitution-ai/
 - *Splits*: Train (80%) / Test (20%)  
 
 ##  Exploratory Data Analysis
-- *English texts* contain words like: parliament, rights, constitution, president  
-- *Kiswahili texts* contain words like: katiba, bunge, rais, sheria  
-- The vocabularies are *highly distinct*, making classification straightforward.
+In this section we explore both English and Kiswahili text to identify:
+
+- Number of articles/sections
+- Distribution of text length per article
+- Common words and phrases
+- Coverage of topics across the Constitution
+
+Some of the findings are:
+
+ *English texts* contain words like: parliament, rights, constitution, president  
+ *Kiswahili texts* contain words like: katiba, bunge, rais, sheria  
+ The vocabularies are *highly distinct*, making classification straightforward.
 
 ## Visualizations
 
 ### Tableau([link](https://public.tableau.com/app/profile/mathews.odongo/viz/Kenya_Constitution/Dashboard1?publish=yes))
 
+We used matplotlib and seaborn for the plots.
+
+Visualizations are stored in the images/ directory and embedded in the notebook.
 
 
 ##  Models and Performance
@@ -182,3 +195,6 @@ This project was collaboratively developed by:
 - Mathews Odongo ([email](mailto:wandera59@gmail.com)) | [LinkedIn](https://www.linkedin.com/in/mathews-odongo-9a2541368?trk=contact-info)
 - Nightingale Jeptoo ([email](mailto:nightingalemib@gmail.com)) | [LinkedIn](https://www.linkedin.com/in/jeptoo-nightingale-36131741/)
 - Tinah Ngei ([email](mailto:tinahngei@gmail.com)) | [LinkedIn](https://www.linkedin.com/in/tinah-ngei-4b411386/)
+
+## License
+This project is licensed for educational use under the MIT License.
