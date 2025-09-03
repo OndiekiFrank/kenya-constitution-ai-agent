@@ -1,74 +1,74 @@
-import pickle
-import faiss
-import pandas as pd
-from sentence_transformers import SentenceTransformer
-import numpy as np
-from pathlib import Path
+# src/retrieval.py
+from typing import List, Tuple
+import re
 
-# Paths
-DATA_DIR = Path(_file_).resolve().parents[1] / "Data"
-INDEX_PATH = DATA_DIR / "faiss_index.bin"
-META_PATH = DATA_DIR / "id_to_metadata.pkl"
-CSV_PATH = DATA_DIR / "kenya_constitution_prepared.csv"
+# Dummy database of sections for demonstration. Replace with real embeddings/search later.
+CONSTITUTION_SECTIONS = [
+    {
+        "section": "Article 136",
+        "text": (
+            "The President shall be elected by registered voters in a national election. "
+            "A decision of the President in the performance of any function shall be in writing "
+            "and bear the seal and signature of the President."
+        )
+    },
+    {
+        "section": "Article 147",
+        "text": (
+            "The Deputy President shall be the principal assistant of the President and shall "
+            "deputise for the President in the execution of the President's functions. "
+            "The President nominates or appoints judges, Cabinet Secretaries, ambassadors, "
+            "and other public officers. The President may confer honours and exercise the power of mercy."
+        )
+    },
+    {
+        "section": "Article 155",
+        "text": (
+            "The President shall chair Cabinet meetings, direct and co-ordinate ministries and government departments, "
+            "and assign responsibilities for the implementation and administration of any Act of Parliament to a Cabinet Secretary."
+        )
+    },
+    {
+        "section": "Article 217",
+        "text": "The President exercises oversight over national revenue allocated to county governments."
+    }
+]
 
-# Load model once
-MODEL = SentenceTransformer("all-MiniLM-L6-v2")
+def retrieve(query: str, top_k: int = 5) -> List[Tuple[str, str]]:
+    """
+    Retrieve top matching sections for a query.
+    Returns a list of tuples: (section, text)
+    """
+    # Simple keyword-based matching for demonstration
+    query_lower = query.lower()
+    scored_sections = []
 
-# Load FAISS index
-faiss_index = faiss.read_index(str(INDEX_PATH))
+    for entry in CONSTITUTION_SECTIONS:
+        text_lower = entry["text"].lower()
+        score = sum(1 for word in query_lower.split() if word in text_lower)
+        if score > 0:
+            scored_sections.append((score, entry["section"], entry["text"]))
 
-# Load metadata
-with open(META_PATH, "rb") as f:
-    id_to_metadata = pickle.load(f)
+    # Sort by score descending
+    scored_sections.sort(reverse=True, key=lambda x: x[0])
 
-# Load full constitution (for optional context synthesis)
-constitution_df = pd.read_csv(CSV_PATH)
-
-
-def embed_text(text: str) -> np.ndarray:
-    """Convert text to embeddings."""
-    return MODEL.encode([text])
-
-
-def retrieve(query: str, k: int = 5):
-    """Retrieve top-k passages related to the query."""
-    query_vec = embed_text(query).astype("float32")
-    distances, indices = faiss_index.search(query_vec, k)
-
-    hits = []
-    for i, idx in enumerate(indices[0]):
-        if idx == -1:  # Skip empty slots
-            continue
-        metadata = id_to_metadata.get(idx, {"text": "", "section": "Unknown"})
-        hits.append({
-            "rank": i + 1,
-            "score": float(distances[0][i]),
-            "section": metadata.get("section"),
-            "text": metadata.get("text"),
-        })
-    return hits
+    # Return top_k results
+    return [(sec, txt) for _, sec, txt in scored_sections[:top_k]]
 
 
-def synthesize_answer(query: str, hits: list) -> str:
-    """Naive synthesis: concatenate retrieved text."""
-    if not hits:
-        return "No relevant information found in the constitution."
-    context = " ".join(hit["text"] for hit in hits)
-    return f"Based on the constitution, here’s what I found: {context}"
+def synthesize_answer(query: str, top_k: int = 5) -> str:
+    """
+    Generate a concise answer from the top retrieved sections.
+    """
+    top_sections = retrieve(query, top_k)
 
+    if not top_sections:
+        return "No relevant information found in the Constitution."
 
-# ---------------------------------------------------
-# Run standalone for testing
-# ---------------------------------------------------
-if _name_ == "_main_":
-    test_query = "What is the role of the president?"
-    print(f"Query: {test_query}\n")
+    answers = []
+    for section, text in top_sections:
+        # Clean up the text for readability
+        clean_text = re.sub(r"\s+", " ", text).strip()
+        answers.append(f"{clean_text} (Section: {section})")
 
-    results = retrieve(test_query, k=3)
-    print("Top results:")
-    for r in results:
-        print(f"- Section: {r['section']} | Score: {r['score']:.4f}")
-        print(f"  Text: {r['text']}\n")
-
-    answer = synthesize_answer(test_query, results)
-    print("Synthesized Answer:\n", answer)
+    return " ".join(answers)
