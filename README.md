@@ -1,13 +1,37 @@
 # kenya-constitution-ai-agent
 An NLP-powered multilingual AI assistant for exploring the Kenyan Constitution in English and Swahili. Uses Retrieval-Augmented Generation (RAG) with NLP pipelines for accurate, accessible legal Q&amp;A.
 
+## Table of contents
+
+
 ##  Business Context
 Kenya’s Constitution is published in both English and Kiswahili, but citizens, students, and policymakers often face challenges in accessing and understanding it.  
 
 This project aims to:
 - Classify legal text by language.  
 - Retrieve relevant constitutional articles.  
-- Support *question answering* and knowledge democratization.  
+- Support *question answering* and knowledge democratization. 
+
+## Dataset used
+
+
+##  Directory Structure
+
+kenya-constitution-ai/  
+├── Data/  
+│   ├── The_Constitution_of_Kenya_2010.pdf  
+│   ├── Kielelezo_Pantanifu_cha_Katiba_ya_Kenya.pdf  
+│   ├── kenya_constitution_structured.csv  
+│   └── kenya_constitution_prepared.csv  
+├── Notebooks/  
+│   └── Kenya_Constitution_AI_Agent.ipynb  
+├── Models/  
+│   ├── traditional_ml_models.pkl  
+│   └── deep_learning_model.h5  
+├── Images/  
+│   └── (Saved charts, dashboards, and figures)  
+├── README.md  
+└── .gitignore
 
 ##  Data Preparation
 - *Dataset size*: 121 legal text samples  
