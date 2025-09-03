@@ -22,3 +22,30 @@ This project aims to:
 - *English texts* contain words like: parliament, rights, constitution, president  
 - *Kiswahili texts* contain words like: katiba, bunge, rais, sheria  
 - The vocabularies are *highly distinct*, making classification straightforward.
+
+##  Models and Performance
+
+We evaluated several models on the task of classifying between *Kiswahili* and *English* texts.  
+The models were compared using *Accuracy, F1 Score, and Recall*.
+
+---
+
+###  Traditional ML Models
+
+| Rank | Model                 | Accuracy | F1     | Recall | Notes                          |
+|------|-----------------------|----------|--------|--------|--------------------------------|
+| 1    | Naive Bayes           | 1.0000   | 1.0000 | 1.0000 | Lightweight, very fast         |
+| 1    | AdaBoost (LogReg)     | 1.0000   | 1.0000 | 1.0000 | Strong ensemble model          |
+| 2    | Stacking Classifier   | 0.9917   | 0.9917 | 0.9917 | Balanced but slightly lower    |
+| 3    | Logistic Regression   | 0.9833   | 0.9833 | 0.9833 | Simple, interpretable baseline |
+| 3    | Voting Classifier     | 0.9833   | 0.9833 | 0.9833 | Ensemble of multiple models    |
+| 3    | Bagging (LogReg)      | 0.9833   | 0.9833 | 0.9833 | Variance reduction ensemble    |
+| 4    | Gradient Boosting     | 0.9667   | 0.9665 | 0.9667 | Slower, prone to overfitting   |
+| 5    | Random Forest         | 0.9503   | 0.9331 | 0.9340 | Underperformed due to small data |
+
+###  Deep Learning Models
+
+| Model              | Accuracy | F1     | Recall | Notes                                     |
+|--------------------|----------|--------|--------|-------------------------------------------|
+| Neural Network (NN)| 0.9800–0.9900 | 0.9800–0.9900 | 0.9800–0.9900 | Required more compute, but scalable to complex tasks |
+
