@@ -2,7 +2,18 @@
 An NLP-powered multilingual AI assistant for exploring the Kenyan Constitution in English and Swahili. Uses Retrieval-Augmented Generation (RAG) with NLP pipelines for accurate, accessible legal Q&amp;A.
 
 ## Table of contents
-
+- [Business Context](#business-context)
+- [Datasets Used](#datasets-used)
+- [Directory Structure](#directory-structure)
+- [Data Preparation](#data-preparation)
+- [Exploratory Data Analysis](#exploratory-data-analysis)
+- [Visualizations](#visualizations)
+- [Models and Performance](#models-and-performance)
+- [Model Interpretability](#model-interpretability)
+- [Findings](#findings)
+- [Recommendations](#recommendations)
+- [Conclusion](#conclusion)
+- [Team](#team)
 
 ##  Business Context
 Kenya’s Constitution is published in both English and Kiswahili, but citizens, students, and policymakers often face challenges in accessing and understanding it.  
