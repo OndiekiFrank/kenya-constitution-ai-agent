@@ -90,11 +90,11 @@ Visualizations are stored in the images/ directory and embedded in the notebook.
 
 - The box plot shows the **distribution, median, and outliers** of article lengths.
 
+**Distribution of Article lengths(Word Count)**
 
+![Image2](Images/Distribution%20of%20Article%20lengths(Word%20Count).png)
 
-
-
-
+Most articles in the Constitution are short (under 1,000 words), with a few very long outliers. The English and Kiswahili versions show similar length distributions, confirming good alignment.
 
 ##  Models and Performance
 
