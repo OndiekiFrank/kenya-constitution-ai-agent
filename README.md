@@ -94,3 +94,33 @@ Understanding *why* models perform well is just as important as their accuracy.
 - Results are perfect, but dataset is *small (121 samples, 25 test samples)*.  
 - On *larger/noisier datasets* (slang, code-switching, spelling errors), performance may drop.
 
+##  Findings
+- *ML and DL models generalize well*.  
+- *Dropout* reduced overfitting in neural nets.  
+- DL accuracy was comparable to ML but needed more compute.  
+- *ML (Naive Bayes, AdaBoost)* → perfect accuracy.  
+- *DL (Neural Nets)* → slightly lower but *scalable*.  
+- ML → interpretable (coefficients, feature importance).  
+- DL → less interpretable but stronger for contextual tasks.  
+
+---
+
+##  Recommendations
+- Save trained models (deep_model.h5, ML pickles).  
+- Use ML for *fast classification*.  
+- Use DL for *contextual understanding*.  
+- Hybrid pipeline → ML (baseline) + DL (semantic tasks).  
+- Scale with *Word2Vec, GloVe, BERT, Transformers*.  
+- Deploy on *AWS, GCP, Hugging Face*.  
+- Retrain with *amendments + case law*.  
+- Adopt *active learning* with user feedback.
+
+##  Conclusion
+
+The *Kenya Constitution AI Agent* has progressed from preprocessing and traditional ML models to incorporating *deep learning* for contextual understanding.  
+By combining both approaches, the system delivers *accurate, interpretable, and context-rich answers* to legal and constitutional queries.  
+
+This project highlights the potential of *AI in democratizing access to constitutional knowledge, making legal information more accessible to the **public, students, and policymakers*.  
+
+---
+
