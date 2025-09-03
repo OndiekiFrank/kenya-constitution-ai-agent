@@ -14,6 +14,15 @@ This project aims to:
 
 ## Dataset used
 
+All data files are located in the Data/ folder:
+
+| File Name | Source |
+|-----------|--------|
+| The_Constitution_of_Kenya_2010.pdf | Kenya Law (Official English Version) |
+| Kielelezo_Pantanifu_cha_Katiba_ya_Kenya.pdf | Kenya Law (Official Kiswahili Version) |
+
+
+> All datasets were obtained from publicly available legal sources and are used *strictly for educational and research purposes*.
 
 ##  Directory Structure
 
