@@ -200,6 +200,7 @@ This project highlights the potential of *AI in democratizing access to constitu
 ---
 # Kenya Constitution AI Agent
 
+![Image2](Images/AI.png)
 Ask questions about the **Constitution of Kenya (2010)** and get AI-powered, context-aware answers.  
 Deployed live on **Render** → [Kenya Constitution AI Agent](https://kenya-constitution-ai-agent-m5sj.onrender.com/)
 
