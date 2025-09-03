@@ -1,3 +1,5 @@
+<img src="Images/The%20Kenyan%20constitution%20is%20the….jpg" width="400" height="500">
+
 # kenya-constitution-ai-agent
 An NLP-powered multilingual AI assistant for exploring the Kenyan Constitution in English and Swahili. Uses Retrieval-Augmented Generation (RAG) with NLP pipelines for accurate, accessible legal Q&amp;A.
 
