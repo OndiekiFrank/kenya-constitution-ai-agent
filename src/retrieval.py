@@ -1,61 +1,53 @@
 # src/retrieval.py
-from typing import List, Tuple
+from typing import List, Dict
+import json
 import re
+from pathlib import Path
 
-# Dummy database of sections for demonstration. Replace with real embeddings/search later.
-CONSTITUTION_SECTIONS = [
-    {
-        "section": "Article 136",
-        "text": (
-            "The President shall be elected by registered voters in a national election. "
-            "A decision of the President in the performance of any function shall be in writing "
-            "and bear the seal and signature of the President."
-        )
-    },
-    {
-        "section": "Article 147",
-        "text": (
-            "The Deputy President shall be the principal assistant of the President and shall "
-            "deputise for the President in the execution of the President's functions. "
-            "The President nominates or appoints judges, Cabinet Secretaries, ambassadors, "
-            "and other public officers. The President may confer honours and exercise the power of mercy."
-        )
-    },
-    {
-        "section": "Article 155",
-        "text": (
-            "The President shall chair Cabinet meetings, direct and co-ordinate ministries and government departments, "
-            "and assign responsibilities for the implementation and administration of any Act of Parliament to a Cabinet Secretary."
-        )
-    },
-    {
-        "section": "Article 217",
-        "text": "The President exercises oversight over national revenue allocated to county governments."
-    }
-]
+# -----------------------------
+# Load Constitution Data
+# -----------------------------
+DATA_PATH = Path(__file__).resolve().parents[1] / "Data" / "constitution.json"
 
-def retrieve(query: str, top_k: int = 5) -> List[Tuple[str, str]]:
+if DATA_PATH.exists():
+    with open(DATA_PATH, "r", encoding="utf-8") as f:
+        CONSTITUTION_SECTIONS: List[Dict[str, str]] = json.load(f)
+else:
+    CONSTITUTION_SECTIONS = []
+    print(f"⚠️ Warning: Constitution file not found at {DATA_PATH}")
+
+
+# -----------------------------
+# Retrieval function
+# -----------------------------
+def retrieve(query: str, top_k: int = 5) -> List[Dict[str, str]]:
     """
     Retrieve top matching sections for a query.
-    Returns a list of tuples: (section, text)
+    Returns a list of dicts: {"section": ..., "text": ..., "score": ...}
     """
-    # Simple keyword-based matching for demonstration
     query_lower = query.lower()
     scored_sections = []
 
     for entry in CONSTITUTION_SECTIONS:
-        text_lower = entry["text"].lower()
+        section = entry.get("section", "Unknown Section")
+        text = entry.get("text", "")
+        text_lower = text.lower()
+
+        # Simple keyword-based scoring
         score = sum(1 for word in query_lower.split() if word in text_lower)
+
         if score > 0:
-            scored_sections.append((score, entry["section"], entry["text"]))
+            scored_sections.append({"section": section, "text": text, "score": score})
 
-    # Sort by score descending
-    scored_sections.sort(reverse=True, key=lambda x: x[0])
+    # Sort by score (descending)
+    scored_sections.sort(key=lambda x: x["score"], reverse=True)
 
-    # Return top_k results
-    return [(sec, txt) for _, sec, txt in scored_sections[:top_k]]
+    return scored_sections[:top_k]
 
 
+# -----------------------------
+# Answer synthesis
+# -----------------------------
 def synthesize_answer(query: str, top_k: int = 5) -> str:
     """
     Generate a concise answer from the top retrieved sections.
@@ -66,8 +58,9 @@ def synthesize_answer(query: str, top_k: int = 5) -> str:
         return "No relevant information found in the Constitution."
 
     answers = []
-    for section, text in top_sections:
-        # Clean up the text for readability
+    for entry in top_sections:
+        section = entry.get("section", "Unknown Section")
+        text = entry.get("text", "")
         clean_text = re.sub(r"\s+", " ", text).strip()
         answers.append(f"{clean_text} (Section: {section})")
 

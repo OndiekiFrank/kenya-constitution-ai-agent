@@ -1,38 +1,40 @@
-# streamlit_app.py
+import streamlit as st
 import sys
 from pathlib import Path
-import streamlit as st
 
-# -----------------------------
-# Ensure src folder is in path
-# -----------------------------
-sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
+# Add src/ to sys.path
+ROOT_DIR = Path(__file__).resolve().parents[1]
+SRC_DIR = ROOT_DIR / "src"
+sys.path.append(str(SRC_DIR))
 
-# -----------------------------
-# Imports
-# -----------------------------
-from retrieval import retrieve, synthesize_answer
+from retrieval import synthesize_answer
 
 # -----------------------------
 # Streamlit UI
 # -----------------------------
-st.set_page_config(page_title="🇰🇪 Constitution QA Agent", layout="wide")
 st.title("🇰🇪 Constitution QA Agent")
 st.write("Ask a question about the Kenyan Constitution and get relevant answers!")
 
+# User input
 query = st.text_input("Enter your question:")
-k = st.number_input("Number of top results (k):", min_value=1, max_value=20, value=5, step=1)
 
-if st.button("Get Answer") and query:
-    with st.spinner("Searching the Constitution..."):
-        hits = retrieve(query, k=k)
-        answer = synthesize_answer(query, hits)
-    
-    st.subheader("Answer:")
-    st.write(answer)
+# Number input for top_k
+top_k = st.number_input(
+    "Number of top results (k):",
+    min_value=1,
+    max_value=10,
+    value=3,
+    step=1
+)
 
-    st.subheader("Top Hits:")
-    for hit in hits:
-        st.markdown(f"**Section:** {hit['section']} | **Score:** {hit['score']:.4f}")
-        st.write(hit['text'])
-        st.write("---")
+# Run retrieval
+if st.button("Get Answer"):
+    if query.strip():
+        try:
+            answer = synthesize_answer(query, top_k=int(top_k))
+            st.write("### Answer:")
+            st.write(answer)
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
+    else:
+        st.warning("Please enter a question.")
