@@ -198,6 +198,54 @@ By combining both approaches, the system delivers *accurate, interpretable, and 
 This project highlights the potential of *AI in democratizing access to constitutional knowledge, making legal information more accessible to the **public, students, and policymakers*.  
 
 ---
+# Kenya Constitution AI Agent
+
+Ask questions about the **Constitution of Kenya (2010)** and get AI-powered, context-aware answers.  
+Deployed live on **Render** → [Kenya Constitution AI Agent](https://kenya-constitution-ai-agent-m5sj.onrender.com/)
+
+---
+
+##  Features
+- **Ask any question** about the Kenyan Constitution  
+- **Fast retrieval** using embeddings + FAISS vector search  
+- **Powered by **Sentence Transformers** for semantic similarity  
+- **Deployed on Render** with Streamlit frontend  
+
+---
+
+##  How to Use
+1. Visit the live app → [Kenya Constitution AI Agent](https://kenya-constitution-ai-agent-m5sj.onrender.com/)  
+2. Enter your question (e.g., *“What are the roles of the President?”*)  
+3. Select number of top results (default = 5)  
+4. Get instant, relevant answers with references to the Constitution  
+
+---
+
+##  Local Setup
+Clone the repo and run locally:
+
+```bash
+# Clone repo
+git clone https://github.com/OndiekiFrank/kenya-constitution-ai-agent.git
+cd kenya-constitution-ai-agent
+```
+
+```bash
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate   # On Windows use venv\Scripts\activate
+```
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+```
+
+```bash
+# Run Streamlit app
+streamlit run app/streamlit_app.py
+```
+
 
 ## Team
 This project was collaboratively developed by:
